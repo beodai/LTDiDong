@@ -1,6 +1,6 @@
 
-# Hoang Van A
-### MSV: 000111
+# Cao Thanh Dai
+### MSV: 22810310392
 ## Ket qua
 
-![Hinh anh 01](IMG_7151.png)
+![Hinh anh 01](CustomComponent.png)
