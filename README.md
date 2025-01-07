@@ -3,4 +3,4 @@
 ### MSV: 000111
 ## Ket qua
 
-![Hinh anh 01](CustomComponent.png)
+![Hinh anh 01](IMG_7151.png)
