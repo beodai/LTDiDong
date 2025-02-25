@@ -1,5 +1,6 @@
 Cao Thành Đại
 22810310392
 Bài làm: App
-https://github.com/user-attachments/assets/d5a83bff-57ba-47df-a215-6594f6230258
-https://github.com/user-attachments/assets/83d41d25-7ecf-428c-8f23-64c8346e8559
+
+![Image](https://github.com/user-attachments/assets/5708fd97-251b-46e8-86a4-2f9ac5e07844)
+![Image](https://github.com/user-attachments/assets/f8bac2f6-318b-4654-92a4-0f8cdf6059e5)
