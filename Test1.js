@@ -5,6 +5,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Ionicons } from '@expo/vector-icons';
+import { useEffect } from 'react';
 
 const HomeScreen = () => {
     return (
@@ -61,27 +62,41 @@ const HomeScreen = () => {
 };
 
 const ScanScreen = ({ navigation }) => {
-    return (
+    useEffect(() => {
+        const parent = navigation.getParent();
+        parent?.setOptions({ tabBarStyle: { display: 'none' } });
+    
+        return () => {
+          parent?.setOptions({
+            tabBarStyle: {
+              height: 80,
+              backgroundColor: '#FFFFFF',
+              borderRadius: 40,
+              shadowColor: '#000',
+              shadowOffset: { width: 4, height: 2 },
+              shadowOpacity: 0.3,
+              shadowRadius: 5,
+            },
+          });
+        };
+      }, [navigation]);
+    
+      return (
         <View style={styles.containerScan}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" size={24} color="indigo" />
           </TouchableOpacity>
     
           <View style={styles.scanArea}>
-            <Image
-              source={require('./image/screen-img.png')}
-              style={styles.bottleImage}
-            />
+            <Image source={require('./image/screen-img.png')} style={styles.bottleImage} />
             <View style={styles.scanOverlay}>
               <View style={styles.scanBorder}></View>
+              <Image source={require('./image/scan-image.png')} style={styles.scanImage} />
             </View>
           </View>
     
           <View style={styles.infoContainer}>
-            <Image
-              source={require('./image/info-img.png')}
-              style={styles.thumbnail}
-            />
+            <Image source={require('./image/info-img.png')} style={styles.thumbnail} />
             <View style={styles.textContainer}>
               <Text style={styles.subtitle}>Lauren's</Text>
               <Text style={styles.title}>Orange Juice</Text>
@@ -91,7 +106,7 @@ const ScanScreen = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         </View>
-    );    
+      );
 };
 
 
@@ -105,8 +120,15 @@ const HomeStack = () => (
 );
 
 const ScanStack = () => (
-  <Stack.Navigator>
-    <Stack.Screen name="Scan" component={ScanScreen} options={{ headerShown: false }} />
+    <Stack.Navigator>
+    <Stack.Screen
+      name="Scan"
+      component={ScanScreen}
+      options={{ 
+        headerShown: false, 
+        tabBarStyle: { display: 'none' }  // Ẩn Bottom Tab
+      }}  
+    />
   </Stack.Navigator>
 );
 
@@ -117,39 +139,45 @@ const TabNavigator = () => (
         let icon;
         if (route.name === 'Home') {
           icon = require('./icon/icon-home.png');
-        } else if (route.name === 'Scan') {
+        } else if (route.name === 'Noti') {
           icon = require('./icon/icon-noti.png');
-        } else if (route.name === 'History') {
+        } else if (route.name === 'Scan') {
           icon = require('./icon/icon-scan.png');
-        } else if (route.name === 'Cart') {
+        } else if (route.name === 'History') {
           icon = require('./icon/icon-history.png');
+        } else if (route.name === 'Cart') {
+          icon = require('./icon/icon-cart.png');
         }
 
         return (
           <Image
             source={icon}
             style={{
-              width: 24,
-              height: 24,
-              tintColor: focused ? '#3B82F6' : '#6B7280', // Đổi màu khi focus
+              width: 28,
+              height: 28,
+              tintColor: focused ? '#3B82F6' : '#C4C4C4',
             }}
           />
         );
       },
       tabBarStyle: {
-        height: 60,
-        backgroundColor: '#ffffff',
-        borderTopWidth: 1,
-        borderTopColor: '#E5E7EB',
+        height: 80,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 40,
+        shadowColor: '#000',
+        shadowOffset: { width: 4, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
       },
-      tabBarShowLabel: false, // Ẩn chữ dưới icon
+      tabBarShowLabel: false,
     })}
-    >
-      <Tab.Screen name="Home" component={HomeStack} options={{ headerShown: false }} />
-      <Tab.Screen name="Scan" component={ScanScreen} options={{ headerShown: false }} />
-      <Tab.Screen name="History" component={HomeStack} options={{ headerShown: false }} />
-      <Tab.Screen name="Cart" component={HomeStack} options={{ headerShown: false }} />
-    </Tab.Navigator>
+  >
+    <Tab.Screen name="Home" component={HomeStack} options={{ headerShown: false }} />
+    <Tab.Screen name="Noti" component={HomeStack} options={{ headerShown: false }} />
+    <Tab.Screen name="Scan" component={ScanStack} options={{ headerShown: false }} />
+    <Tab.Screen name="History" component={HomeStack} options={{ headerShown: false }} />
+    <Tab.Screen name="Cart" component={HomeStack} options={{ headerShown: false }} />
+  </Tab.Navigator>
   );
   
 
@@ -198,12 +226,18 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   card: {
-    backgroundColor: '#F3F4F6',
+    backgroundColor: '#F8FAFC',
     width: '48%',
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 12,
     alignItems: 'center',
-    marginBottom: 16,
+    justifyContent: 'center',
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   cardTitle: {
     fontWeight: '600',
@@ -227,7 +261,7 @@ const styles = StyleSheet.create({
   },
   containerScan: {
     flex: 1,
-    backgroundColor: '#f5f5dc',
+    backgroundColor: '#eadece',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 16,
@@ -272,16 +306,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  scanImage: {
+    width: '83%',
+    height: '40%',
+    bottom: -110,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
+  },
   scanBorder: {
-    width: '80%',
-    height: '60%',
+    width: '85%',
+    height: '65%',
     borderWidth: 4,
     borderColor: 'white',
-    borderRadius: 16,
+    borderRadius: 20,
+    position: 'absolute',
   },
   infoContainer: {
     position: 'absolute',
-    bottom: 170,
+    bottom: 80,
     width: '90%',
     maxWidth: 320,
     backgroundColor: 'white',
@@ -289,11 +335,11 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowColor: '#d69974',
+    shadowOffset: { width: 5, height: 5 },
+    shadowOpacity: 1,
+    shadowRadius: 35,
+    elevation: 4,
   },
   thumbnail: {
     width: 48,
