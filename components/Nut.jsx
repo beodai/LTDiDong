@@ -10,8 +10,8 @@ export default function Nut({ backgroundColor, content, textColor, onPress }) {
 
 const styles = StyleSheet.create({
   button: {
-    width: 20,
-    height: 150,
+    paddingVertical: 20,
+    paddingHorizontal: 150,
     borderRadius: 8,
     marginVertical: 10,
     alignItems: "center",
