@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions, TextInput, KeyboardAvoidingView, ScrollView, Platform, Keyboard, Animated } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions, TextInput, KeyboardAvoidingView, ScrollView, Platform, Keyboard, Animated, SafeAreaView, FlatList } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const Stack = createStackNavigator();
 
-const splashScreen = ({ navigation }) => {
+const SplashScreen = ({ navigation }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       navigation.replace('Started'); // Thay thế màn hình hiện tại bằng màn hình Started
@@ -110,7 +111,7 @@ const PhoneNumberInput = ({ navigation }) => {
         <Image source={require('./image/GroceryUI/number-screen.png')} style={styles.phoneNumberBackground} />
         
         <View style={styles.phoneNumberContent}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton1}>
             <Text style={styles.backButtonText}>←</Text>
           </TouchableOpacity>
           
@@ -163,7 +164,7 @@ const Verification = ({ navigation }) => {
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.verificationContainer}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.verificationContent}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton1}>
             <Text style={styles.backButtonText}>←</Text>
           </TouchableOpacity>
           
@@ -185,7 +186,7 @@ const Verification = ({ navigation }) => {
       </ScrollView>
       
       <Animated.View style={[styles.nextButtonContainer, { bottom: keyboardHeight }]}> 
-        <TouchableOpacity style={styles.nextButton}>
+        <TouchableOpacity onPress={() => navigation.navigate('SelectLocation')} style={styles.nextButton}>
           <Text style={styles.nextButtonText}>→</Text>
         </TouchableOpacity>
       </Animated.View>
@@ -193,6 +194,281 @@ const Verification = ({ navigation }) => {
   );
 };
 
+// Màn hình Select Location
+const SelectLocation = ({ navigation }) => {
+  const [isOpenZone, setIsOpenZone] = useState(false); // Dropdown cho Your Zone
+  const [isOpenArea, setIsOpenArea] = useState(false); // Dropdown cho Your Area
+
+  // State để lưu giá trị được chọn
+  const [selectedZone, setSelectedZone] = useState('Banaree'); // Giá trị mặc định cho Your Zone
+  const [selectedArea, setSelectedArea] = useState(''); // Giá trị mặc định cho Your Area
+
+  // Danh sách tùy chọn cho Your Zone
+  const zones = ['Banaree', 'Zone 1', 'Zone 2', 'Zone 3'];
+
+  // Danh sách tùy chọn cho Your Area
+  const areas = ['Area A', 'Area B', 'Area C'];
+
+  // Hàm mở/đóng dropdown cho Your Zone
+  const toggleZoneDropdown = () => {
+    setIsOpenZone(!isOpenZone);
+    if (isOpenArea) setIsOpenArea(false); // Đóng dropdown Your Area nếu đang mở
+  };
+
+  // Hàm mở/đóng dropdown cho Your Area
+  const toggleAreaDropdown = () => {
+    setIsOpenArea(!isOpenArea);
+    if (isOpenZone) setIsOpenZone(false); // Đóng dropdown Your Zone nếu đang mở
+  };
+
+  // Hàm chọn giá trị cho Your Zone
+  const selectZone = (zone) => {
+    setSelectedZone(zone);
+    setIsOpenZone(false); // Đóng dropdown sau khi chọn
+  };
+
+  // Hàm chọn giá trị cho Your Area
+  const selectArea = (area) => {
+    setSelectedArea(area);
+    setIsOpenArea(false); // Đóng dropdown sau khi chọn
+  };
+
+  return (
+      <SafeAreaView style={styles.selectLocationContainer}>
+    {/* Nút back */}
+    <TouchableOpacity
+      style={styles.backButton}
+      onPress={() => navigation.goBack()}
+    >
+      <Icon name="arrow-back" size={37} color="#333" />
+    </TouchableOpacity>
+
+    {/* Nội dung chính */}
+    <View style={styles.selectLocationContent}>
+      <Image
+        source={require('./image/GroceryUI/map.png')}
+        style={styles.selectLocationBackground}
+      />
+      <Text style={styles.selectLocationTitle}>Select Your Location</Text>
+      <Text style={styles.selectLocationSubtitle}>
+        Switch on your location to stay in tune with what's happening in your area
+      </Text>
+
+      
+
+      {/* Your Zone Dropdown */}
+      <View style={styles.dropdownContainer}>
+        <Text style={styles.label}>Your Zone</Text>
+        <TouchableOpacity
+          style={styles.dropdownButton}
+          onPress={toggleZoneDropdown}
+        >
+          <Text style={styles.dropdownText}>
+            {selectedZone || 'Select your zone'}
+          </Text>
+          <Text style={styles.dropdownArrow}>▼</Text>
+        </TouchableOpacity>
+        {isOpenZone && (
+          <View style={styles.dropdownList}>
+            <FlatList
+              data={zones}
+              keyExtractor={(item) => item}
+              renderItem={({ item }) => (
+                <TouchableOpacity onPress={() => selectZone(item)}>
+                  <Text style={styles.dropdownItem}>{item}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        )}
+      </View>
+
+      {/* Your Area Dropdown */}
+      <View style={styles.dropdownContainer}>
+        <Text style={styles.label}>Your Area</Text>
+        <TouchableOpacity
+          style={styles.dropdownButton}
+          onPress={toggleAreaDropdown}
+        >
+          <Text style={styles.dropdownText}>
+            {selectedArea || 'Types of your area'}
+          </Text>
+          <Text style={styles.dropdownArrow}>▼</Text>
+        </TouchableOpacity>
+        {isOpenArea && (
+          <View style={styles.dropdownList}>
+            <FlatList
+              data={areas}
+              keyExtractor={(item) => item}
+              renderItem={({ item }) => (
+                <TouchableOpacity onPress={() => selectArea(item)}>
+                  <Text style={styles.dropdownItem}>{item}</Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        )}
+      </View>
+    <TouchableOpacity
+      style={styles.submitButton}
+      onPress={() => navigation.navigate('LogIn')}
+    >
+      <Text style={styles.submitButtonText}>Submit</Text>
+    </TouchableOpacity>
+    </View>
+  </SafeAreaView>
+  );
+};
+
+// Màn hình Log In
+const LogIn = ({ navigation }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  return (
+    <View style={styles.LogInContainer}>
+      {/* Logo */}
+      <View style={styles.logoContainer}>
+        <Image
+          source={require('./image/GroceryUI/carrot.png')}
+          style={styles.logo}
+        />
+      </View>
+      {/* Title */}
+      <Text style={styles.LogIntitle}>Login</Text>
+      <Text style={styles.LogInsubtitle}>Enter your emails and password</Text>
+
+      {/* Email Input */}
+      <Text style={styles.LogInlabel}>Email</Text>
+      <TextInput
+        style={styles.LogIninput}
+        placeholder="you@example.com"
+        placeholderTextColor="#999"
+        keyboardType="email-address"
+        value={email}
+        onChangeText={setEmail}
+      />
+
+      {/* Password Input */}
+      <Text style={styles.LogInlabel}>Password</Text>
+      <View style={styles.passwordInputContainer}>
+        <TextInput
+          style={styles.passwordInput}
+          placeholder="********"
+          placeholderTextColor="#999"
+          secureTextEntry={!isPasswordVisible}
+          value={password}
+          onChangeText={setPassword}
+        />
+        <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
+          <Text style={styles.togglePassword}>
+            {isPasswordVisible ? 'Hide' : 'Show'}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Forgot Password */}
+      <TouchableOpacity style={styles.forgotPasswordContainer}>
+        <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+      </TouchableOpacity>
+
+      {/* Login Button */}
+      <TouchableOpacity style={styles.loginButton}>
+        <Text style={styles.loginButtonText}>Log In</Text>
+      </TouchableOpacity>
+
+      {/* Bottom Sign Up */}
+      <View style={styles.signUpContainer}>
+        <Text style={styles.signUpText}>Don’t have an account?</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('SignUp')}>
+          <Text style={styles.signUpLink}>Sign Up</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
+// Màn hình Sign Up
+const SignUp = ({ navigation }) => {
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+
+  return (
+    <View style={styles.SignUpContainer}>
+      {/* Logo */}
+      <View style={styles.SignUplogoContainer}>
+        <Image
+          source={require('./image/GroceryUI/carrot.png')}
+          style={styles.SignUplogo}
+        />
+      </View>
+
+      {/* Title */}
+      <Text style={styles.SignUptitle}>Sign Up</Text>
+      <Text style={styles.SignUpsubtitle}>Enter your credentials to continue</Text>
+
+      {/* Username */}
+      <Text style={styles.SignUplabel}>Username</Text>
+      <TextInput
+        style={styles.SignUpinput}
+        placeholder="Enter your name"
+        placeholderTextColor="#999"
+      />
+
+      {/* Email */}
+      <Text style={styles.SignUplabel}>Email</Text>
+      <TextInput
+        style={styles.SignUpinput}
+        placeholder="you@example.com"
+        placeholderTextColor="#999"
+        keyboardType="email-address"
+      />
+
+      {/* Password */}
+      <Text style={styles.SignUplabel}>Password</Text>
+      <View style={styles.SignUppasswordInputContainer}>
+        <TextInput
+          style={styles.SignUppasswordInput}
+          placeholder="********"
+          placeholderTextColor="#999"
+          secureTextEntry={!isPasswordVisible}
+        />
+        <TouchableOpacity onPress={() => setIsPasswordVisible(!isPasswordVisible)}>
+          <Text style={styles.SignUptogglePassword}>
+            {isPasswordVisible ? 'Hide' : 'Show'}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Terms */}
+      <View style={styles.termsContainer}>
+        <Text style={styles.termsText}>By continuing you agree to our</Text>
+        <TouchableOpacity>
+          <Text style={styles.linkText}>Terms of Service</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.termsContainer}>
+        <Text style={styles.termsText}>and</Text>
+        <TouchableOpacity>
+          <Text style={styles.linkText}>Privacy Policy.</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Sign Up Button */}
+      <TouchableOpacity style={styles.signUpButton}>
+        <Text style={styles.signUpButtonText}>Sign Up</Text>
+      </TouchableOpacity>
+
+      {/* Already have account */}
+      <View style={styles.loginRedirectContainer}>
+        <Text style={styles.termsText}>Already have an account?</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+          <Text style={styles.linkText}>Login</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
 
 const { width, height } = Dimensions.get('window');
 
@@ -226,9 +502,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
+    top: 70,
     width: 50,
     height: 57,
-    marginBottom: 20,
+    marginBottom: 40,
+    alignSelf: 'center',
   },
   title: {
     width: 250,
@@ -342,9 +620,11 @@ const styles = StyleSheet.create({
     color: '#999',
     marginBottom: 10,
   },
-  backButton: {
+  backButton1: {
     position: 'absolute',
+    top: -50,
     left: 20,
+    zIndex: 1,
   },
   backButtonText: {
     fontSize: 40,
@@ -399,11 +679,6 @@ const styles = StyleSheet.create({
     color: 'green',
     fontSize: 16,
   },
-  backButton: {
-    position: 'absolute',
-    top: -50,
-    left: 20,
-  },
   backButtonText: {
     fontSize: 40,
     color: '#000',
@@ -421,17 +696,340 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: '#fff',
   },
+
+// Styles cho Select Location
+selectLocationContainer: {
+  flex: 1,
+  backgroundColor: '#fff',
+},
+backButton: {
+  position: 'absolute',
+  top: 60,
+  left: 20,
+  zIndex: 1,
+},
+selectLocationContent: {
+  flex: 1,
+  width: '100%',
+  padding: 10,
+},
+selectLocationBackground: {
+  width: 224.69,
+  height: 170.69,
+  resizeMode: 'contain',
+  marginVertical: 20,
+  alignSelf: 'center',
+},
+selectLocationTitle: {
+  fontSize: 26,
+  fontWeight: '600',
+  color: '#333',
+  marginTop: 50,
+  textAlign: 'center',
+},
+selectLocationSubtitle: {
+  fontSize: 16,
+  color: '#7C7C7C',
+  marginTop: 10,
+  marginBottom: 100,
+  textAlign: 'center',
+},
+dropdownContainer: {
+  padding: 20,
+  width: '100%',
+},
+label: {
+  fontSize: 14,
+  color: '#999',
+  marginBottom: 5,
+},
+dropdownButton: {
+  borderBottomWidth: 1,
+  borderBottomColor: '#ccc',
+  paddingVertical: 10,
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+},
+dropdownText: {
+  fontSize: 16,
+  color: '#333',
+},
+dropdownArrow: {
+  fontSize: 16,
+  color: '#333',
+},
+dropdownList: {
+  marginTop: 10,
+  borderWidth: 1,
+  borderColor: '#ccc',
+  borderRadius: 5,
+  backgroundColor: '#fff',
+  maxHeight: 150, // Giới hạn chiều cao để tránh tràn
+  overflow: 'hidden',
+},
+dropdownItem: {
+  paddingVertical: 10,
+  paddingHorizontal: 15,
+  fontSize: 16,
+  color: '#333',
+},
+submitButton: {
+  backgroundColor: '#53B175', // màu xanh giống ảnh
+  height: 70,
+  borderRadius: 22,
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginTop: 20,
+  marginHorizontal: 20, // canh đều 2 bên
+},
+submitButtonText: {
+  color: '#fff',
+  fontSize: 18,
+  fontWeight: 'bold',
+},
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    padding: 10,
+    fontSize: 16,
+    color: '#333',
+    marginBottom: 20,
+  },
+  forgotPasswordText: {
+    color: '#4CAF50',
+    fontSize: 16,
+    textAlign: 'right',
+    marginBottom: 20,
+  },
+  switchText: {
+    color: '#4CAF50',
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 20,
+  },
+  termsText: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+
+  //Style Login
+  LogInContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  LogInlogoContainer: {
+    alignItems: 'center',
+    marginTop: 100,
+  },
+  logo: {
+    top: 70,
+    width: 60,
+    height: 60,
+    resizeMode: 'contain',
+    alignSelf: 'center',
+  },
+  LogIntitle: {
+    fontWeight: '600',
+    fontSize: 26,
+    marginLeft: 30,
+    marginTop: 150,
+  },
+  LogInsubtitle: {
+    fontSize: 16,
+    marginLeft: 30,
+    marginTop: 10,
+    color: '#7C7C7C',
+  },
+  LogInlabel: {
+    fontSize: 18,
+    marginLeft: 30,
+    marginTop: 40,
+    color: '#7C7C7C',
+  },
+  LogIninput: {
+    fontSize: 16,
+    marginLeft: 30,
+    marginTop: 15,
+    width: 380,
+    height: 30,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    color: '#333',
+  },
+  passwordInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 30,
+    marginTop: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    width: 380,
+  },
+  passwordInput: {
+    fontSize: 16,
+    flex: 1,
+    height: 30,
+    color: '#333',
+  },
+  togglePassword: {
+    fontSize: 14,
+    color: '#7C7C7C',
+  },
+  forgotPasswordContainer: {
+    marginTop: 20,
+    marginLeft: 280,
+  },
+  forgotPasswordText: {
+    color: '#7C7C7C',
+    fontSize: 14,
+  },
+  loginButton: {
+    backgroundColor: '#53B175',
+    width: 353,
+    height: 63,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    marginTop: 30,
+  },
+  loginButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  signUpContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  signUpText: {
+    color: '#181725',
+  },
+  signUpLink: {
+    color: '#53B175',
+    fontWeight: '500',
+    marginLeft: 5,
+  },
+
+  //Style SignUp
+  SignUpContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  SignUplogoContainer: {
+    alignItems: 'center',
+    marginTop: 100,
+  },
+  SignUplogo: {
+    width: 60,
+    height: 60,
+    resizeMode: 'contain',
+  },
+  SignUptitle: {
+    fontWeight: '600',
+    fontSize: 26,
+    marginLeft: 30,
+    marginTop: 50,
+  },
+  SignUpsubtitle: {
+    fontSize: 16,
+    marginLeft: 30,
+    marginTop: 10,
+    color: '#7C7C7C',
+  },
+  SignUplabel: {
+    fontSize: 18,
+    marginLeft: 30,
+    marginTop: 40,
+    color: '#7C7C7C',
+  },
+  SignUpinput: {
+    fontSize: 16,
+    marginLeft: 30,
+    marginTop: 15,
+    width: 380,
+    height: 30,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    color: '#333',
+  },
+  SignUppasswordInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 30,
+    marginTop: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    width: 380,
+  },
+  SignUppasswordInput: {
+    fontSize: 16,
+    flex: 1,
+    height: 30,
+    color: '#333',
+  },
+  togglePassword: {
+    fontSize: 14,
+    color: '#7C7C7C',
+  },
+  termsContainer: {
+    flexDirection: 'row',
+    marginLeft: 29,
+    marginTop: 10,
+  },
+  termsText: {
+    fontWeight: '500',
+    color: '#181725',
+  },
+  linkText: {
+    color: '#5eb078',
+    marginLeft: 5,
+    fontWeight: '500',
+  },
+  signUpButton: {
+    backgroundColor: '#5eb078',
+    width: 353,
+    height: 67,
+    marginLeft: 40,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 80,
+  },
+  signUpButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  loginRedirectContainer: {
+    flexDirection: 'row',
+    alignSelf: 'center',
+    marginTop: 20,
+  },
+
 });
+
 
 const Groceries_App_UI = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="splashScreen">
-        <Stack.Screen name="splashScreen" component={splashScreen} options={{ headerShown: false }} />
-        <Stack.Screen name="Started" component={Started} options={{ headerShown: false }} />
-        <Stack.Screen name="SignIn" component={SignIn} options={{ headerShown: false }} />
-        <Stack.Screen name="PhoneNumberInput" component={PhoneNumberInput} options={{ headerShown: false }} />
-        <Stack.Screen name="Verification" component={Verification} options={{ headerShown: false }} />
+      <Stack.Navigator 
+        initialRouteName="SplashScreen"
+        screenOptions={{ headerShown: false }}
+      >
+        <Stack.Screen name="SplashScreen" component={SplashScreen} />
+        <Stack.Screen name="Started" component={Started} />
+        <Stack.Screen name="SignIn" component={SignIn} />
+        <Stack.Screen name="PhoneNumberInput" component={PhoneNumberInput} />
+        <Stack.Screen name="Verification" component={Verification} />
+        <Stack.Screen name="SelectLocation" component={SelectLocation} />
+        <Stack.Screen name="LogIn" component={LogIn} />
+        <Stack.Screen name="SignUp" component={SignUp} />
       </Stack.Navigator>
     </NavigationContainer>
   );
